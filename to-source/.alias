@@ -1,0 +1,15 @@
+alias ll="ls -al"
+
+# disable Spotlight
+alias spotoff="sudo mdutil -a -i off"
+
+# enable Spotlight
+alias spoton="sudo mdutil -a -i on"
+
+# lock the screen (when going AFK)
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+alias table-flip='echo "(╯°□°）╯︵ ┻━┻)"'
+
+# setup alias to open brew emacs plus as emacs
+alias emacs="open /usr/local/opt/emacs-plus@28/Emacs.app"

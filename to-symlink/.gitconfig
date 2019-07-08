@@ -1,0 +1,15 @@
+[color]
+  ui = true
+
+[core]
+  excludesfile = ~/.gitignore_global
+
+[alias]
+  diff-file-branches = "!f() { git diff -U10000 \"${1}\" \"${2}\" -- \"${3}\"; }; f"
+  lo = log --decorate --pretty=format:\"%Cred%h%Creset [%Cgreen%an%Creset] %s (%Cred%ar%Creset) %C(cyan)%d%Creset\" --graph
+
+[merge]
+  ff = only
+
+[diff]
+  colorMoved = zebra

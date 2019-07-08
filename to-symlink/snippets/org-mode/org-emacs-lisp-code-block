@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: org-emacs-lisp-code-block
+# key: org
+# --
+#+begin_src emacs-lisp
+  ("TODO")
+#+end_src

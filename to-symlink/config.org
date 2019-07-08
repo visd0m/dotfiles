@@ -1,0 +1,1002 @@
+* visd0m configuration
+
+** Misc
+
+*** Meta modifier
+
+#+begin_src emacs-lisp
+  ;; (setq mac-command-modifier 'meta)
+  ;; (setq mac-option-modifier 'option)
+#+end_src
+
+*** Packages sources
+
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives '(("melpa-stable" . "https://stable.melpa.org/packages/")
+                           ("melpa" . "https://melpa.org/packages/")
+                           ("gnu" . "https://elpa.gnu.org/packages/")
+                           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                           ("org" . "http://orgmode.org/elpa/")))
+
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  ;; initialize use-package on non-Linux platforms
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (use-package auto-package-update
+    :ensure t
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-hide-results t)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "09:00"))
+#+end_src
+
+
+*** tabs
+
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  (setq indent-line-function 'insert-tab)
+  (setq electric-indent-mode nil)
+#+end_src
+
+
+*** exec path from shell
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :init (when (memq window-system '(mac ns x))
+            (exec-path-from-shell-initialize)))
+#+end_src
+
+
+*** os notifications
+
+#+begin_src emacs-lisp
+  (use-package alert
+    :ensure t
+    :config (setq alert-default-style 'osx-notifier))
+#+end_src
+
+
+*** Custom file
+
+#+begin_src emacs-lisp
+  (setq-default custom-file "~/.emacs.d/custom.el")
+  (when (file-exists-p custom-file)
+    (load custom-file))
+#+end_src
+
+*** Camel Case movement
+
+#+begin_src emacs-lisp
+  (global-subword-mode 1)
+#+end_src
+
+*** Spaces instead of TABS
+#+begin_src emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+end_src
+
+*** Matching paren
+
+#+begin_src emacs-lisp
+  (setq blink-matching-paren nil)
+#+end_src
+
+*** Backup files
+
+#+begin_src emacs-lisp
+  (setq backup-directory-alist
+	`((".*" . ,temporary-file-directory)))
+  (setq auto-save-file-name-transforms
+	`((".*" ,temporary-file-directory t)))
+#+end_src
+
+*** CamelCase to snake_case to SCREAMING_SNAKE_CASE
+
+#+begin_src emacs-lisp
+  (use-package string-inflection
+    :ensure t)
+#+end_src
+
+*** Keep folders clean
+
+#+begin_src emacs-lisp
+    (use-package no-littering
+      :ensure t)
+
+    (setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
+#+end_src
+
+
+** UI
+
+*** Basic UI configuration
+
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+  ;; disable visible scrollbar
+  (scroll-bar-mode -1)        
+  ;; disable the toolbar
+  (tool-bar-mode -1)          
+  ;; disable tooltips
+  (tooltip-mode -1)
+  ;; give some breathing room
+  (set-fringe-mode 10)        
+  ;; disable the menu bar
+  (menu-bar-mode -1)          
+
+  ;; set up the visible bell
+  (setq visible-bell nil)
+  (setq ring-bell-function 'ignore)
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  ;; disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  vterm-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+  ;; font configuration
+  (defvar efs/default-font-size 130)
+  (defvar efs/default-variable-font-size 130)
+
+  ;; make frame transparency overridable
+  (defvar efs/frame-transparency '(90 . 90))
+
+  (set-face-attribute 'default nil :font "Fira Code" :height efs/default-font-size)
+
+  ;; set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "Fira Code" :height efs/default-font-size)
+
+  ;; set the variable pitch face
+  (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
+
+  ;; themes
+  (use-package doom-themes
+    :ensure t
+    :init
+    (load-theme 'doom-material)
+    (doom-modeline-mode 1))
+
+  (use-package alect-themes
+    :ensure t)
+    ;; :init (load-theme 'alect-light))
+
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1))
+
+  (setq doom-modeline-time-icon t)
+  (setq doom-modeline-icon t)
+  (setq doom-modeline-buffer-file-name-style 'auto)
+  (setq doom-modeline-buffer-name t)
+  (setq doom-modeline-indent-info nil)
+  (setq doom-modeline-buffer-encoding t)
+  (setq doom-modeline-enable-word-count nil)
+
+  (use-package dashboard
+    :ensure t
+    :config (dashboard-setup-startup-hook)
+    :custom
+    (dashboard-startup-banner 'logo)
+    (dashboard-center-content t)
+    (dashboard-projects-backend 'projectile)
+    (dashboard-footer-messages '("(╯°□°)╯︵ ┻━┻"))
+    (dashboard-items '((recents  . 5)
+                       (bookmarks . 5)
+                       (projects . 5)
+                       (agenda . 5)
+                       (registers . 5))))
+  (use-package spinner
+    :ensure t)
+#+end_src
+
+** Completion
+
+*** wich key
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :defer 0
+    :diminish which-key-mode
+    :config
+    (which-key-mode)
+    (setq which-key-idle-delay 1))
+#+end_src
+
+*** ivy & counsel
+
+#+begin_src emacs-lisp
+  (use-package ivy
+    :ensure t
+    :diminish
+    :bind (("C-s" . swiper)
+       ([remap list-buffers] . ivy-switch-buffer)
+       :map ivy-minibuffer-map
+       ("TAB" . ivy-alt-done)
+       :map ivy-switch-buffer-map
+       ("C-d" . ivy-switch-buffer-kill))
+    :config
+    (ivy-mode 1))
+
+  (use-package ivy-rich
+    :ensure t
+    :after ivy
+    :after counsel
+    :config
+    (ivy-rich-mode 1))
+
+  (use-package ivy-hydra
+    :ensure t
+    :after ivy
+    :after hydra)
+
+  (use-package counsel
+    :ensure t
+    :bind (("C-M-j" . 'counsel-switch-buffer)
+       :map minibuffer-local-map
+       ("C-r" . 'counsel-minibuffer-history))
+    :custom
+    (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+    :config
+    (counsel-mode 1))
+
+  (use-package ivy-prescient
+    :ensure t
+    :after counsel
+    :custom
+    (ivy-prescient-enable-filtering nil)
+    :config
+    (ivy-prescient-mode 1))
+#+end_src
+
+*** helm
+
+Not using Helm at the moment
+
+#+begin_src emacs-lisp
+;; todo configure helm
+  ;; (use-package helm
+  ;;   :ensure t)
+#+end_src
+
+*** helpful
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :ensure t
+    :commands (helpful-callable helpful-variable helpful-command helpful-key)
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+#+end_src
+
+*** hydra
+
+#+begin_src emacs-lisp
+  (use-package hydra
+    :ensure t
+    :defer t)
+
+  (defhydra hydra-text-scale (:timeout 4)
+    ("j" text-scale-increase "in")
+    ("k" text-scale-decrease "out")
+    ("f" nil "finished" :exit t))
+#+end_src
+
+** Coding
+
+*** version control
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    ;; :init
+    ;; (setq magit-blame-styles '((margin
+    ;;     			(margin-format " %s%f" " %C %a" " %H")
+    ;;     			(margin-width . 42)
+    ;;     			(margin-face . magit-blame-margin)
+    ;;     			(margin-body-face magit-blame-dimmed))))
+    ;; (setq magit-blame-echo-style 'margin)
+    :custom
+    ;; :hook (prog-mode . (lambda () (magit-blame-echo nil)))
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+  
+  (use-package diff-hl
+    :ensure t
+    :after magit
+    :init
+    (global-diff-hl-mode)
+    (add-hook 'magit-pre-refresh-hook 'diff-hl-magit-pre-refresh)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+#+end_src
+
+*** dired
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :bind (("C-x C-j" . dired-jump)))
+
+  (use-package dired-hide-dotfiles
+    :ensure t)
+#+end_src
+
+*** neo tree
+#+begin_src emacs-lisp
+  (use-package neotree
+    :ensure t)
+#+end_src
+*** lsp
+#+begin_src emacs-lisp
+  (defun efs/lsp-mode-setup ()
+    (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+    (setq lsp-headerline-breadcrumb-icons-enable nil)
+    (lsp-headerline-breadcrumb-mode))
+
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :hook (lsp-mode . efs/lsp-mode-setup)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    (setq lsp-elm-elm-path "/usr/local/bin/elm")
+    (add-to-list 'exec-path "~/Dev/elixir/elixir-ls")
+    ;; :config
+    ;; (lsp-enable-which-key-integration t)
+    :custom
+    ;; (lsp-progress-function 'lsp-on-progress-legacy)
+    (lsp-rust-server 'rust-analyzer)
+    (rustic-lsp-server 'rust-analyzer)
+    (lsp-rust-analyzer-cargo-watch-command "clippy")
+    ;; (lsp-rust-analyzer-experimental-proc-attr-macros nil)
+    ;; (lsp-rust-analyzer-proc-macro-enable nil)
+    ;; https://emacs-lsp.github.io/lsp-mode/page/performance/
+    (gc-cons-threshold 100000000)
+    (read-process-output-max (* 1024 1024)) ;; 1mb
+    (lsp-toggle-signature-auto-activate)
+    (lsp-idle-delay 0.500)
+    (lsp-rf-language-server-start-command '("~/.asdf/shims/python" "~/.vscode/extensions/robocorp.robotframework-lsp-1.9.0/src/robotframework_ls"))
+    (lsp-progress-spinner-type 'moon)
+    (lsp-elm-only-update-diagnostics-on-save t)
+    (lsp-elm-disable-elmls-diagnostics t))
+
+  (use-package lsp-ui
+    :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-doc-enable nil)
+    (lsp-ui-sideline-show-diagnostics t)
+    (lsp-ui-sideline-show-hover nil)
+    (lsp-ui-sideline-show-code-actions nil))
+
+  (use-package flycheck
+    :ensure t
+    :hook (prog-mode . flycheck-mode))
+
+  ;; (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+
+  (use-package lsp-treemacs
+    :ensure t
+    :after lsp)
+
+  (use-package lsp-ivy
+    :ensure t
+    :after lsp)
+
+  (use-package yasnippet
+    :ensure t
+    :config
+    (setq yas-snippet-dirs '("~/.emacs.d/snippets"))
+    (yas-reload-all)
+    (add-hook 'prog-mode-hook 'yas-minor-mode)
+    (add-hook 'text-mode-hook 'yas-minor-mode))
+#+end_src
+*** eglot
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure t)
+#+end_src
+
+*** company
+
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :hook
+    (lsp-mode . company-mode)
+    (eglot-mode . company-mode)
+    (emacs-lisp-mode . company-mode)
+    (sql-interactive-mode . company-mode)
+    (lisp-interaction-mode . company-mode)
+    :bind ("C-c c TAB" . company-complete)
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.5))
+
+  (use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode))
+#+end_src
+
+*** projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :ensure t
+    :after projectile
+    :config (counsel-projectile-mode))
+#+end_src
+
+*** rainbow
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook (prog-mode . rainbow-delimiters-mode))
+
+#+end_src
+
+*** rust
+
+#+begin_src emacs-lisp
+
+  (use-package toml-mode
+    :ensure t)
+
+  ;; (use-package rust-mode
+  ;;   :ensure t
+  ;;   :hook (rust-mode . lsp-deferred)
+  ;;   :init (which-function-mode t)
+  ;;   :config (setq rust-format-on-save t))
+
+  (use-package cargo
+    :ensure t
+    :hook (rust-mode . cargo-minor-mode))  
+
+  (use-package flycheck-rust
+    :ensure t
+    :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+
+  (use-package rustic
+    :ensure t
+    :config
+    (setq rustic-spinner-type 'moon)
+    (setq rustic-format-on-save t)
+    ;; (setq rustic-lsp-client 'eglot)
+    )
+#+end_src
+
+*** python
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred))
+#+end_src
+
+
+#+begin_src emacs-lisp
+  (use-package robot-mode
+    :ensure t
+    :hook (robot-mode . lsp-deferred))
+#+end_src
+
+
+*** clojure
+    
+#+begin_src emacs-lisp
+  
+  (use-package cider
+    :ensure t
+    :hook (clojure-mode . lsp-deferred))
+#+end_src
+
+*** elixir
+
+#+begin_src emacs-lisp
+  (use-package elixir-mode
+    :ensure t
+    :hook (elixir-mode . lsp-deferred))
+#+end_src
+
+*** go
+    
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :ensure t)
+#+end_src
+
+*** java
+#+begin_src emacs-lisp
+  (use-package yaml
+    :ensure t)
+
+  (use-package lsp-java
+    :ensure t
+    :config (add-hook 'java-mode-hook 'lsp))
+#+end_src
+
+*** graphql
+
+#+begin_src emacs-lisp
+  (use-package graphql-mode
+    :ensure t)
+#+end_src
+
+*** sql
+
+#+begin_src emacs-lisp
+  (use-package sql
+    :ensure t
+    :hook (sql-interactive-mode . toggle-truncate-lines)
+    :config
+    (setq sql-mysql-login-params (append sql-mysql-login-params '(port :default ,3306)))
+    (setq sql-postgres-login-params (append sql-postgres-login-params '(port :default ,5432))))
+#+end_src    
+
+*** markdown
+
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+	   ("\\.md\\'" . markdown-mode)
+	   ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
+#+end_src
+
+*** elm
+
+#+begin_src emacs-lisp
+  (use-package elm-mode
+    :ensure t
+    :hook
+    (elm-mode . lsp-deferred)
+    (elm-mode . elm-format-on-save-mode))
+#+end_src
+
+*** php
+
+#+begin_src emacs-lisp
+  (use-package php-mode
+    :ensure t
+    :hook (php-mode . lsp-deferred))
+#+end_src
+
+*** yaml
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode
+    :ensure t)
+#+end_src
+
+*** commenting
+
+#+begin_src emacs-lisp
+  (use-package evil-nerd-commenter
+    :ensure t
+    :bind ("M-/" . evilnc-comment-or-uncomment-lines))
+#+end_src
+
+*** org
+
+#+begin_src emacs-lisp
+  (use-package org
+    :pin org
+    :ensure t
+    :bind (([remap org-metaleft] . left-word)
+           ([remap org-metaright] . right-word)))
+
+  (use-package org-roam
+    :ensure t
+    :init (org-roam-db-autosync-mode)
+    :custom (org-roam-capture-templates '(("d"
+                                           "default"
+                                           plain
+                                           "%?"
+                                           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+                                           :unnarrowed t)
+                                          ("l"
+                                           "literature"
+                                           plain
+                                           "%?"
+                                           :target (file+head "literature/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: literature/${title}\n"))
+                                          ("f"
+                                           "fleeting"
+                                           plain
+                                           "%?"
+                                           :target (file+head "fleeting/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: fleeting/${title}\n"))
+                                          ("p"
+                                           "persistent"
+                                           plain
+                                           "%?"
+                                           :target (file+head "persistent/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: persistent/${title}\n")))))
+#+end_src
+
+*** request
+
+#+begin_src emacs-lisp
+  (use-package request
+    :ensure t)
+#+end_src
+
+*** terminal
+
+#+begin_src emacs-lisp
+  (use-package multi-vterm
+    :ensure t)
+  
+  (use-package vterm
+    :ensure t
+    :hook (vterm-mode . vterm-clear)
+    :bind
+    ("C-c C-t" . vterm-copy-mode))
+#+end_src
+
+** Editing & Movement
+
+*** multiple cursors
+
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :ensure t
+    :bind
+    ("C->" . mc/mark-next-like-this)
+    ("C-<" . mc/mark-previous-like-this)
+    ("C-c C-<" . mc/mark-all-like-this)
+    ("C-c C-e" . mc/edit-lines))
+#+end_src
+
+*** ace jump
+
+#+begin_src emacs-lisp
+  (use-package ace-jump-mode
+    :ensure t
+    :bind ("C-c c SPC" . ace-jump-mode))
+#+end_src
+
+*** back-button
+
+#+begin_src emacs-lisp
+  (use-package back-button
+    :ensure t
+    :bind
+    ("C-{" . back-button-local-backward)
+    ("C-}" . back-button-local-forward)
+    ("M-[" . back-button-global-backward)
+    ("M-]" . back-button-global-forward))
+#+end_src
+
+*** window
+
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :bind ([remap other-window] . ace-window))
+#+end_src
+
+*** undo
+
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :ensure t
+    :init (global-undo-tree-mode)
+    :bind ([remap upcase-region] . undo-tree-visualize))
+#+end_src
+
+*** ag
+
+#+begin_src emacs-lisp
+  (use-package ag
+    :ensure t)
+#+end_src
+
+*** rg
+
+#+begin_src emacs-lisp
+  (use-package rg
+    :ensure t)
+#+end_src
+
+*** wgrep
+#+begin_src emacs-lisp
+  (use-package wgrep
+    :ensure t)
+#+end_src
+
+** Tramp
+   
+#+begin_src emacs-lisp
+  (use-package docker-tramp
+    :ensure t)
+  
+  (use-package kubernetes-tramp
+    :ensure t)
+#+end_src
+
+** Kubernetes
+   
+#+begin_src emacs-lisp
+  (use-package kubectx-mode
+    :ensure t)
+#+end_src
+
+** Custom functions
+
+*** select line
+
+#+begin_src emacs-lisp
+  (defun visd0m/select-line ()
+    "Select current line and leave the point at the end of the line."
+    (interactive)
+    (move-beginning-of-line nil)
+    (set-mark-command nil)
+    (move-end-of-line nil))
+#+end_src
+
+*** go to elixir hexdoc
+
+#+begin_src emacs-lisp
+  (defun visd0m/elixir-doc ()
+    "Open elixir documentation hexdocs.pm/elixir in external browser."
+    (interactive)
+    (let ((url "https://hexdocs.pm/elixir"))
+      (browse-url-default-browser url)))
+#+end_src
+
+*** go to rust doc
+
+#+begin_src emacs-lisp
+  (defun visd0m/elixir-doc-hex (hex)
+    "Open elixir documentation hexdocs.pm/`HEX' in external browser."
+    (interactive "sHex: ")
+    (let ((url (format "https://hexdocs.pm/%s" hex)))
+      (browse-url-default-browser url)))
+
+  (defun visd0m/rust-doc-crate (crate)
+    "Open rust documentation doc.rust-lang.org/`CRATE' in external browser."
+    (interactive "sCrate: ")
+    (let ((url (format "https://docs.rs/%s" crate)))
+      (browse-url-default-browser url)))
+#+end_src
+
+*** kill buffer file name
+
+#+begin_src emacs-lisp
+  (defun visd0m/kill-buffer-file-truename ()
+    "Kill current buffer file truename."
+    (interactive)
+    (if buffer-file-truename
+        (kill-new buffer-file-truename)))
+#+end_src
+
+*** kill buffer file project relative name
+
+#+begin_src emacs-lisp
+  (defun visd0m/buffer-file-project-relative-name ()
+    "Get current buffer file git project relative name or nil."
+    (let ((project-root-dir (vc-root-dir))
+          (absolute-name buffer-file-truename))
+      (if (and project-root-dir absolute-name)
+          (let ((project-relative-buffer-file-name (string-remove-prefix
+                                                    project-root-dir
+                                                    absolute-name)))
+            project-relative-buffer-file-name)
+        nil)))
+#+end_src
+
+*** go to file at line
+
+#+begin_src emacs-lisp
+  (defun visd0m/go-to-file-at-line (file-and-line)
+    "Given a path `FILE-AND-LINE' like 'foo/bar:10' go to file: foo/bar at line: 10 in the current git project."
+    (interactive "sWhere to: ")
+    (let ((project-root-dir (vc-root-dir)))
+      (if project-root-dir
+          (let* ((tokens (split-string file-and-line ":"))
+                 (file-name (nth 0 tokens))
+                 (line (nth 1 tokens)))
+            (find-file-existing (format "%s%s" project-root-dir file-name))
+            (goto-line (string-to-number line))))))
+#+end_src
+
+*** open line in github
+
+#+begin_src emacs-lisp
+  (defun visd0m/open-in-github ()
+    "Open the the current file in the current branch in the current repo at the current line in github."
+    (interactive)
+    (let* ((remote-url (visd0m/git-remote-url))
+           (github-remote (visd0m/parse-git-remote remote-url)))
+      (if (eq (alist-get 'service github-remote) 'github)
+          ;; github
+          (let* ((base-url (alist-get 'base-url github-remote))
+                 (repo (alist-get 'repo github-remote))
+                 (current-branch (magit-get-current-branch))
+                 (current-buffer (visd0m/buffer-file-project-relative-name))
+                 (current-line (line-number-at-pos))
+                 (composed-url (format "%s/%s/blob/%s/%s#L%s"
+                                       base-url
+                                       repo
+                                       current-branch
+                                       current-buffer
+                                       current-line)))
+            (if (and
+                 current-branch
+                 base-url
+                 current-buffer
+                 github-remote
+                 repo
+                 current-line
+                 composed-url)
+                (browse-url composed-url)
+              (message "Something wrong handling github remote")))
+        (message (format "Unhandled remote: %s" remote-url)))))
+
+  (defun visd0m/git-remote-url ()
+    "Get git remote url."
+    (with-temp-buffer
+      ;; git config --get remote.origin.url
+      (vc-git--call (current-buffer) "config" "--get" "remote.origin.url")
+      (string-trim-right (buffer-string))))
+
+  (defun visd0m/parse-git-remote (remote-url)
+    "Get git remote object parsing `REMOTE-URL'."
+    (let* ((split (split-string remote-url ":"))
+           (prefix (nth 0 split)))
+      (pcase prefix
+        ("git@github.com"
+         (list
+          (cons 'service 'github)
+          (cons 'base-url "https://github.com")
+          (cons 'repo (string-remove-suffix ".git" (nth 1 split)))))
+        (_
+         (list (cons 'service 'unhandled))))))
+#+end_src
+
+*** delete work backword without kill
+
+#+begin_src emacs-lisp
+  (defun vid0m/backward-delete-word-no-kill (arg)
+    "Delete characters backward until encountering the beginning of a word.
+    With argument, do this that many times.
+    This command does not push text to `kill-ring'."
+    (interactive "p")
+    (visd0m/delete-word-no-kill (- arg)))
+
+  (defun visd0m/delete-word-no-kill (arg)
+    "Delete characters forward until encountering the end of a word.
+    With argument, do this that many times.
+    This command does not push text to `kill-ring'."
+    (interactive "p")
+    (delete-region
+     (point)
+     (progn
+       (forward-word arg)
+       (point))))
+#+end_src
+
+*** delete line no kill
+
+#+begin_src emacs-lisp
+  (defun visd0m/delete-line-no-kill ()
+    "Delete the current line.
+    This command does not push text to `kill-ring'."
+    (interactive)
+    (save-excursion
+      (delete-region
+       (progn (forward-visible-line 0) (point))
+       (progn (forward-visible-line 1) (point)))))
+#+end_src
+
+*** kill all "registered" lsp server
+
+#+begin_src emacs-lisp
+  (defun visd0m/lsp-kill-all ()
+    "Kill all currenlty running processes considered lsp servers."
+    (interactive)
+    (seq-each (lambda (process-to-kill) (signal-process process-to-kill 15))
+              (seq-filter
+               'to-kill?
+               (process-list))))
+
+  (defun to-kill?
+      (process)
+    (let ((process-name (process-name process)))
+      (or
+       (string-match "^rust-analyzer$" process-name)
+       (string-match "^elixir-ls$" process-name)
+       (string-match "^elm-ls$" process-name)
+       (string-match "^iph$" process-name))))
+#+end_src
+
+*** upgrade all upgradable packages using list-packages
+#+begin_src emacs-lisp
+  (defun visd0m/upgrade-upgradable-packages ()
+    "Upgrade upgradable packages using list-package and package menu."
+    (interactive)
+    (with-temp-buffer
+      (list-packages)
+      (package-refresh-contents)
+      (package-menu-mark-upgrades)
+      (package-menu-execute)
+      (kill-buffer)))
+#+end_src
+
+
+*** patch for lsp ancestor of
+check if this is needed
+#+begin_src emacs-lisp
+  ;; (defun lsp-f-ancestor-of-patch (path-args)
+  ;;   (mapcar (lambda (path) (downcase path)) path-args))
+
+  ;; (when (eq system-type 'windows-nt) 
+  ;;   (advice-add 'lsp-f-ancestor-of? :filter-args #'lsp-f-ancestor-of-patch)
+  ;;   (advice-add 'lsp-f-same? :filter-args #'lsp-f-ancestor-of-patch))
+#+end_src
+
+** Feed
+
+#+begin_src emacs-lisp
+  (use-package elfeed
+    :ensure t)
+#+end_src
+
+** Telegram
+
+#+begin_src emacs-lisp
+  (use-package telega
+    :ensure t
+    :pin "melpa-stable")
+#+end_src
+
+** Global key bindings
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c c s") 'visd0m/select-line)
+  (global-set-key (kbd "M-<backspace>") 'vid0m/backward-delete-word-no-kill)
+  (global-set-key (kbd "C-<S-backspace>") 'visd0m/delete-line-no-kill)
+#+end_src
+
+** Tips & Tricks
+   To have multiple sqli buffer do as follow: C-u M-x sql-<product>
+
+   To insert a new line in mini buffer: C-q C-j
+
+   To start recording a macro: F3
+   To stop recording a macro: F4
+   To use last recorded macro: F4
