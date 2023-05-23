@@ -257,16 +257,6 @@
     (ivy-prescient-mode 1))
 #+end_src
 
-*** helm
-
-Not using Helm at the moment
-
-#+begin_src emacs-lisp
-;; todo configure helm
-  ;; (use-package helm
-  ;;   :ensure t)
-#+end_src
-
 *** helpful
 
 #+begin_src emacs-lisp
