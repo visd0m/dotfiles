@@ -37,7 +37,6 @@
   (setq electric-indent-mode nil)
 #+end_src
 
-
 *** exec path from shell
 
 #+begin_src emacs-lisp
@@ -47,7 +46,6 @@
             (exec-path-from-shell-initialize)))
 #+end_src
 
-
 *** os notifications
 
 #+begin_src emacs-lisp
@@ -55,7 +53,6 @@
     :ensure t
     :config (setq alert-default-style 'osx-notifier))
 #+end_src
-
 
 *** Custom file
 
@@ -107,7 +104,6 @@
     (setq auto-save-file-name-transforms
       `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 #+end_src
-
 
 ** UI
 
@@ -502,7 +498,6 @@ Not using Helm at the moment
     :ensure t
     :hook (robot-mode . lsp-deferred))
 #+end_src
-
 
 *** clojure
     
@@ -936,6 +931,7 @@ Not using Helm at the moment
 #+end_src
 
 *** upgrade all upgradable packages using list-packages
+
 #+begin_src emacs-lisp
   (defun visd0m/upgrade-upgradable-packages ()
     "Upgrade upgradable packages using list-package and package menu."
