@@ -154,24 +154,27 @@
   ;; set the variable pitch face
   (set-face-attribute 'variable-pitch nil :font "Cantarell" :height efs/default-variable-font-size :weight 'regular)
 
+  (use-package nerd-icons
+    :ensure t)
+
   ;; themes
   (use-package doom-themes
     :ensure t
     :init
-    ;; (load-theme 'doom-material)
+    (load-theme 'doom-material)
     )
 
-  (use-package alect-themes
-    :ensure t
-    :init (load-theme 'alect-light))
+  ;; (use-package alect-themes
+  ;;   :ensure t
+  ;;   :init (load-theme 'alect-light))
 
   (use-package doom-modeline
     :ensure t
     :init (doom-modeline-mode 1))
 
-  (use-package mood-line
-    :ensure t
-    :init (mood-line-mode 1))
+  ;; (use-package mood-line
+  ;;   :ensure t
+  ;;   :init (mood-line-mode 1))
 
   (setq doom-modeline-time-icon t)
   (setq doom-modeline-icon t)
