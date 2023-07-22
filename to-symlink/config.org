@@ -598,35 +598,35 @@
 
 #+begin_src emacs-lisp
   (use-package org
-    :pin org
     :ensure t
+    :pin org
     :bind (([remap org-metaleft] . left-word)
            ([remap org-metaright] . right-word)))
 
-  (use-package org-roam
-    :ensure t
-    :init (org-roam-db-autosync-mode)
-    :custom (org-roam-capture-templates '(("d"
-                                           "default"
-                                           plain
-                                           "%?"
-                                           :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-                                           :unnarrowed t)
-                                          ("l"
-                                           "literature"
-                                           plain
-                                           "%?"
-                                           :target (file+head "literature/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: literature/${title}\n"))
-                                          ("f"
-                                           "fleeting"
-                                           plain
-                                           "%?"
-                                           :target (file+head "fleeting/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: fleeting/${title}\n"))
-                                          ("p"
-                                           "persistent"
-                                           plain
-                                           "%?"
-                                           :target (file+head "persistent/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: persistent/${title}\n")))))
+    (use-package org-roam
+      :ensure t
+      :init (org-roam-db-autosync-mode)
+      :custom (org-roam-capture-templates '(("d"
+                                             "default"
+                                             plain
+                                             "%?"
+                                             :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+                                             :unnarrowed t)
+                                            ("l"
+                                             "literature"
+                                             plain
+                                             "%?"
+                                             :target (file+head "literature/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: literature/${title}\n"))
+                                            ("f"
+                                             "fleeting"
+                                             plain
+                                             "%?"
+                                             :target (file+head "fleeting/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: fleeting/${title}\n"))
+                                            ("p"
+                                             "persistent"
+                                             plain
+                                             "%?"
+                                             :target (file+head "persistent/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: persistent/${title}\n")))))
 #+end_src
 
 *** request
