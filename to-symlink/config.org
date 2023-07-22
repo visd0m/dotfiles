@@ -942,6 +942,15 @@
       (kill-buffer)))
 #+end_src
 
+** export sql query result to csv file
+
+#+begin_src emacs-lisp
+  (defun visd0m/psql-export-query-result-to-csv (query-to-execute csv-file-name)
+    "Export result of 'QUERY-TO-EXECUTE to csv file 'CSV-FILE-NAME."
+    (interactive "sQuery to execute: \nFFile path: ")
+    (sql-send-string (format "\\copy (%s) to '%s' csv header" query-to-execute csv-file-name)))
+#+end_src
+
 ** Feed
 
 #+begin_src emacs-lisp
