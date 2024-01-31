@@ -1,3 +1,4 @@
+
 * visd0m configuration
 
 ** Misc
@@ -451,6 +452,12 @@
     :ensure t
     :hook (prog-mode . rainbow-delimiters-mode))
 
+#+end_src
+
+*** json
+#+begin_src emacs-lisp
+  (use-package json-mode
+    :ensure t)
 #+end_src
 
 *** rust
