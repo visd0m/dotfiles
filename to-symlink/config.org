@@ -941,12 +941,13 @@
   (defun visd0m/upgrade-upgradable-packages ()
     "Upgrade upgradable packages using list-package and package menu."
     (interactive)
-    (with-temp-buffer
+    (let (package-menu-async-value package-menu-async)
+      (setq package-menu-async nil)
       (list-packages)
-      (package-refresh-contents)
       (package-menu-mark-upgrades)
       (package-menu-execute)
-      (kill-buffer)))
+      (kill-buffer)
+      (setq package-menu-async package-menu-async-value)))
 #+end_src
 
 ** export sql query result to csv file
