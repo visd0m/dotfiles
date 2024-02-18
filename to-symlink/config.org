@@ -538,6 +538,15 @@
     :config (add-hook 'java-mode-hook 'lsp))
 #+end_src
 
+*** dart + flutter
+#+begin_src emacs-lisp
+  (use-package flutter
+    :ensure t)
+
+  (use-package dart-mode
+    :ensure t)
+#+end_src
+
 *** graphql
 
 #+begin_src emacs-lisp
