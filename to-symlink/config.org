@@ -3,6 +3,12 @@
 
 ** Misc
 
+*** Lower minimum warning level
+
+#+begin_src emacs-lisp
+  (setq warning-minimum-level :emergency)
+#+end_src
+
 *** Meta modifier
 
 #+begin_src emacs-lisp
