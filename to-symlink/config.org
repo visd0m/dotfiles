@@ -10,6 +10,7 @@
 #+end_src
 
 *** Meta modifier
+If you are running emacs on a Mac.
 
 #+begin_src emacs-lisp
   ;; (setq mac-command-modifier 'meta)
